@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+
+{% block title %}Book Appointment - OAMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card shadow-sm border-0 rounded-4 p-4">
+                <div class="card-body">
+                    <h2 class="fw-bold mb-4 text-center">Book Your Appointment</h2>
+                    <hr class="mb-4">
+                    
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        <h5 class="fw-bold mb-3"><i class="bi bi-person-circle me-2"></i>Your Information</h5>
+                        <div class="row g-3 mb-4">
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Full Name</label>
+                                <input type="text" class="form-control rounded-pill bg-light border-0 px-3" value="{{ user.get_full_name|default:user.username }}" readonly>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label small fw-semibold text-muted">Email Address</label>
+                                <input type="email" class="form-control rounded-pill bg-light border-0 px-3" value="{{ user.email }}" readonly>
+                            </div>
+                        </div>
+
+                        <h5 class="fw-bold mb-3"><i class="bi bi-calendar-event me-2"></i>Appointment Details</h5>
+                        <div class="mb-4">
+                            <label for="{{ form.availability_slot.id_for_label }}" class="form-label small fw-semibold text-muted">Select Available Time Slot</label>
+                            {{ form.availability_slot }}
+                            <div class="form-text small">Only available slots are listed here. Choose the one that suits you best.</div>
+                            {% for error in form.availability_slot.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="{{ form.notes.id_for_label }}" class="form-label small fw-semibold text-muted">Notes for the Professional</label>
+                            {{ form.notes }}
+                            <div class="form-text small">Tell the professional about your requirements or any special requests.</div>
+                            {% for error in form.notes.errors %}
+                                <div class="text-danger small mt-1">{{ error }}</div>
+                            {% endfor %}
+                        </div>
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary rounded-pill py-2 fw-semibold">Confirm Booking</button>
+                            <a href="{% url 'client_dashboard' %}" class="btn btn-outline-secondary rounded-pill py-2 fw-semibold border-0">Go Back to Dashboard</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

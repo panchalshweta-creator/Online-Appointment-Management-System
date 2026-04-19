@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ business_profile.business_name|default:"Business Dashboard" }} - OAMS{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="d-flex justify-content-between align-items-center mb-4 fade-in">
+        <div>
+            <h1 class="fw-bold text-dark">{{ business_profile.business_name|default:"Business Dashboard" }}</h1>
+            <p class="text-muted">Manage your services and upcoming appointments.</p>
+        </div>
+        <div class="btn-group">
+            <a href="{% url 'add_service' %}" class="btn btn-primary rounded-pill px-4 shadow-sm"><i class="bi bi-plus-lg me-2"></i>Add Service</a>
+            <a href="{% url 'manage_services' %}" class="btn btn-outline-primary rounded-pill px-4 ms-2 shadow-sm">Manage Services</a>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="row g-4 mb-5 fade-in">
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="bg-soft-primary p-3 rounded-4 text-primary"><i class="bi bi-calendar-check fs-3"></i></div>
+                        <span class="text-muted small">Lifetime</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_appointments }}</h3>
+                    <p class="text-muted small mb-0">Total Appointments</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="bg-soft-warning p-3 rounded-4 text-warning"><i class="bi bi-hourglass-split fs-3"></i></div>
+                        <span class="text-muted small">Action Required</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ pending_appointments.count }}</h3>
+                    <p class="text-muted small mb-0">Pending Requests</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="bg-soft-success p-3 rounded-4 text-success"><i class="bi bi-check2-circle fs-3"></i></div>
+                        <span class="text-muted small">Upcoming</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ accepted_appointments.count }}</h3>
+                    <p class="text-muted small mb-0">Accepted/Rescheduled</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-6 col-lg-3">
+            <div class="card border-0 shadow-sm rounded-4 h-100 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div class="bg-soft-info p-3 rounded-4 text-info"><i class="bi bi-briefcase fs-3"></i></div>
+                        <span class="text-muted small">Offerings</span>
+                    </div>
+                    <h3 class="fw-bold mb-1">{{ total_services }}</h3>
+                    <p class="text-muted small mb-0">Active Services</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Appointment Table -->
+    <div class="card border-0 shadow-sm rounded-4 overflow-hidden fade-in">
+        <div class="card-header bg-white p-4 border-0">
+            <h4 class="fw-bold mb-0">Appointment Management</h4>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="bg-light">
+                    <tr>
+                        <th class="px-4 py-3">Client Name</th>
+                        <th class="py-3">Service</th>
+                        <th class="py-3">Date & Time</th>
+                        <th class="py-3">Status</th>
+                        <th class="px-4 py-3 text-end">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in pending_appointments %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold">{{ appointment.client.username }}</div>
+                            <div class="text-muted small">{{ appointment.client.email }}</div>
+                        </td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>
+                            <div>{{ appointment.availability_slot.date|date:"M d, Y" }}</div>
+                            <div class="text-muted small">{{ appointment.availability_slot.start_time|time:"h:i A" }}</div>
+                        </td>
+                        <td><span class="badge bg-warning text-dark rounded-pill px-3">Pending</span></td>
+                        <td class="px-4 text-end">
+                            <div class="d-flex justify-content-end gap-2">
+                                <form action="{% url 'update_appointment_status' appointment.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="Accepted">
+                                    <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Accept</button>
+                                </form>
+                                <form action="{% url 'update_appointment_status' appointment.id %}" method="post">
+                                    {% csrf_token %}
+                                    <input type="hidden" name="status" value="Rejected">
+                                    <button type="submit" class="btn btn-danger btn-sm rounded-pill px-3">Reject</button>
+                                </form>
+                                <a href="{% url 'reschedule_appointment' appointment.id %}" class="btn btn-outline-primary btn-sm rounded-pill px-3">Reschedule</a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <!-- If no pending, show accepted ones in same table or handle separately. 
+                         For brevity, we'll list accepted/requested ones below if pending empty or just list all. -->
+                    {% endfor %}
+
+                    {% for appointment in accepted_appointments %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold">{{ appointment.client.username }}</div>
+                            <div class="text-muted small">{{ appointment.client.email }}</div>
+                        </td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>
+                            <div>{{ appointment.availability_slot.date|date:"M d, Y" }}</div>
+                            <div class="text-muted small">{{ appointment.availability_slot.start_time|time:"h:i A" }}</div>
+                        </td>
+                        <td>
+                            {% if appointment.status == 'Accepted' %}
+                                <span class="badge bg-success rounded-pill px-3">Accepted</span>
+                            {% else %}
+                                <span class="badge bg-info text-dark rounded-pill px-3">Rescheduled</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-4 text-end">
+                            <form action="{% url 'update_appointment_status' appointment.id %}" method="post">
+                                {% csrf_token %}
+                                <input type="hidden" name="status" value="Cancelled">
+                                <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">Cancel</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                    {% for appointment in reschedule_requested %}
+                    <tr>
+                        <td class="px-4">
+                            <div class="fw-bold">{{ appointment.client.username }}</div>
+                        </td>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>
+                            <div class="text-info fw-bold">Wait for client</div>
+                            <div class="text-muted small">Prop: {{ appointment.reschedule_date|date:"M d" }} @ {{ appointment.reschedule_time|time:"H:i" }}</div>
+                        </td>
+                        <td><span class="badge bg-info text-dark rounded-pill px-3">Reschedule Requested</span></td>
+                        <td class="px-4 text-end">
+                            <span class="text-muted small italic">Pending Client Response</span>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% if not pending_appointments and not accepted_appointments and not reschedule_requested %}
+        <div class="text-center py-5">
+            <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+            <h5 class="text-muted">No appointments found.</h5>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}Business Profile - OAMS{% endblock %}
+
+{% block content %}
+<style>
+    .form-control, .form-select {
+        border-radius: 10px;
+        padding: 0.75rem 1rem;
+        border: 1px solid #e0e0e0;
+    }
+    .form-control:focus, .form-select:focus {
+        border-color: #0d6efd;
+        box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+    }
+</style>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-4 p-md-5">
+                    <div class="d-flex justify-content-between align-items-center mb-4">
+                        <h1 class="fw-bold mb-0">Business Profile Setup</h1>
+                        <a href="{% url 'business_dashboard' %}" class="btn btn-outline-primary rounded-pill px-4">Dashboard</a>
+                    </div>
+                    <p class="text-muted mb-5 lead">Complete your profile to become visible to clients and start accepting appointments.</p>
+                    
+                    <form method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        
+                        <div class="row g-4">
+                            <!-- Basic Information -->
+                            <div class="col-12">
+                                <h4 class="fw-bold border-bottom pb-2 mb-4 text-primary">Basic Information</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.business_name.id_for_label }}" class="form-label small fw-semibold text-muted">Business Name</label>
+                                <input type="text" name="business_name" id="id_business_name" class="form-control" value="{{ form.business_name.value|default:'' }}" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.category.id_for_label }}" class="form-label small fw-semibold text-muted">Business Category</label>
+                                {{ form.category }}
+                                {% for error in form.category.errors %}
+                                    <div class="text-danger small">{{ error }}</div>
+                                {% endfor %}
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ form.description.id_for_label }}" class="form-label small fw-semibold text-muted">Business Description</label>
+                                <textarea name="description" id="id_description" class="form-control" rows="4">{{ form.description.value|default:'' }}</textarea>
+                            </div>
+
+                            <!-- Contact Details -->
+                            <div class="col-12 mt-5">
+                                <h4 class="fw-bold border-bottom pb-2 mb-4 text-primary">Contact & Location</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.phone.id_for_label }}" class="form-label small fw-semibold text-muted">Phone Number</label>
+                                <input type="text" name="phone" id="id_phone" class="form-control" value="{{ form.phone.value|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.email.id_for_label }}" class="form-label small fw-semibold text-muted">Business Email</label>
+                                <input type="email" name="email" id="id_email" class="form-control" value="{{ form.email.value|default:'' }}">
+                            </div>
+                            <div class="col-12">
+                                <label for="{{ form.address.id_for_label }}" class="form-label small fw-semibold text-muted">Business Address</label>
+                                <textarea name="address" id="id_address" class="form-control" rows="2">{{ form.address.value|default:'' }}</textarea>
+                            </div>
+
+                            <!-- Operating Hours & Image -->
+                            <div class="col-12 mt-5">
+                                <h4 class="fw-bold border-bottom pb-2 mb-4 text-primary">Availability & Branding</h4>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.business_hours.id_for_label }}" class="form-label small fw-semibold text-muted">Business Hours (e.g., Mon-Fri 9AM-5PM)</label>
+                                <input type="text" name="business_hours" id="id_business_hours" class="form-control" value="{{ form.business_hours.value|default:'' }}">
+                            </div>
+                            <div class="col-md-6">
+                                <label for="{{ form.profile_image.id_for_label }}" class="form-label small fw-semibold text-muted">Profile/Business Image</label>
+                                <div class="input-group">
+                                    <input type="file" name="profile_image" id="id_profile_image" class="form-control">
+                                </div>
+                                {% if business_profile.profile_image %}
+                                    <div class="mt-2 small text-muted">Current image: {{ business_profile.profile_image.name }}</div>
+                                {% endif %}
+                            </div>
+                        </div>
+
+                        <div class="mt-5 pt-3">
+                            <button type="submit" class="btn btn-primary rounded-pill px-5 py-2 fw-semibold shadow-sm">Save Profile Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

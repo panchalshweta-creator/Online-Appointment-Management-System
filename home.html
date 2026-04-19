@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}AppointEase{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="hero-overlay"></div>
+    <div class="hero-content px-3">
+        <h1>Book Appointments Effortlessly</h1>
+        <p>One platform. Complete scheduling control.</p>
+        <div class="hero-buttons">
+            <a href="#features" class="btn-custom btn-primary-custom">Our Features</a>
+            <a href="#contact" class="btn-custom btn-outline-custom">Contact Us</a>
+        </div>
+    </div>
+</section>
+
+<!-- Categories Section -->
+<section id="categories" class="section bg-light">
+    <div class="container text-center">
+        <h2 class="section-title">Explore Categories</h2>
+        <p class="section-subtitle">Find the right professional for your needs from our diverse categories.</p>
+        
+        <div class="row g-4 justify-content-center">
+            {% for category in categories %}
+            <div class="col-lg-2 col-md-4 col-6">
+                <a href="{% url 'category_businesses' category.id %}" class="category-link text-decoration-none">
+                    <div class="category-card p-4 shadow-sm rounded-4 bg-white h-100">
+                        <div class="category-icon mb-3 fs-1 text-primary">
+                            <i class="fa-solid {{ category.icon }}"></i>
+                        </div>
+                        <h5 class="category-name text-dark">{{ category.name }}</h5>
+                    </div>
+                </a>
+            </div>
+            {% empty %}
+            <p>No categories available.</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Features Section -->
+<section id="features" class="section">
+    <div class="container">
+        <h2 class="section-title">Why Choose AppointEase</h2>
+        <p class="section-subtitle">We provide a streamlined and user-friendly experience for both businesses and clients.</p>
+        
+        <div class="row g-4">
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-calendar2-check"></i></div>
+                    <h3>Easy Booking</h3>
+                    <p>An intuitive interface makes booking and managing appointments a breeze for clients.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-shield-lock"></i></div>
+                    <h3>Admin Control</h3>
+                    <p>A powerful dashboard for businesses to manage services, availability, and appointments.</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6">
+                <div class="feature-card">
+                    <div class="feature-icon"><i class="bi bi-bell"></i></div>
+                    <h3>Notifications</h3>
+                    <p>Keep everyone updated with automated notifications for bookings and status changes.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Contact Section -->
+<section id="contact" class="section contact-section">
+    <div class="container">
+        <div class="row g-5 align-items-center">
+            <!-- Contact Info -->
+            <div class="col-lg-5">
+                <div class="contact-info-block">
+                    <h3>Get In Touch</h3>
+                    <p>Have a question or feedback? We’d love to hear from you. Fill out the form, and we'll get back to you shortly.</p>
+                    <div class="info-item">
+                        <i class="bi bi-geo-alt-fill"></i>
+                        <span>Pune, Maharashtra, India</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="bi bi-envelope-fill"></i>
+                        <span>ease@appointease.com</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Form -->
+            <div class="col-lg-7">
+                <div class="contact-form">
+                    {% if messages %}
+                        {% for message in messages %}
+                            <div class="alert alert-success alert-dismissible fade show" role="alert">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endif %}
+                    <form method="POST">
+                        {% csrf_token %}
+                        <div class="row g-3">
+                            <div class="col-md-6">
+                                <label for="name" class="form-label">Name</label>
+                                <input type="text" id="name" name="name" class="form-control-custom" placeholder="Your Name" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="email" class="form-label">Email</label>
+                                <input type="email" id="email" name="email" class="form-control-custom" placeholder="your@example.com" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="subject" class="form-label">Subject</label>
+                                <input type="text" id="subject" name="subject" class="form-control-custom" placeholder="Subject" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="message" class="form-label">Message</label>
+                                <textarea id="message" name="message" class="form-control-custom" rows="5" placeholder="Your message..." required></textarea>
+                            </div>
+                            <div class="col-12 mt-3">
+                                <button type="submit" class="btn-submit">Send Message</button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

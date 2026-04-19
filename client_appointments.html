@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+
+{% block title %}My Appointments - OAMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom fade-in">
+    <h1 class="h2">My Appointments</h1>
+</div>
+
+<div class="row slide-up">
+    {% if appointments %}
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th scope="col">Service</th>
+                        <th scope="col">Business</th>
+                        <th scope="col">Date</th>
+                        <th scope="col">Time</th>
+                        <th scope="col">Status</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for appointment in appointments %}
+                    <tr>
+                        <td>{{ appointment.service.name }}</td>
+                        <td>{{ appointment.service.service_provider.user.username }}</td>
+                        <td>{{ appointment.availability_slot.date|date:"M d, Y" }}</td>
+                        <td>{{ appointment.availability_slot.start_time|time:"h:i A" }} - {{ appointment.availability_slot.end_time|time:"h:i A" }}</td>
+                        <td>
+                            {% if appointment.status == 'pending' %}
+                                <span class="badge bg-warning text-dark">{{ appointment.status }}</span>
+                            {% elif appointment.status == 'approved' %}
+                                <span class="badge bg-success">{{ appointment.status }}</span>
+                            {% elif appointment.status == 'rejected' %}
+                                <span class="badge bg-danger">{{ appointment.status }}</span>
+                            {% elif appointment.status == 'completed' %}
+                                <span class="badge bg-info">{{ appointment.status }}</span>
+                            {% else %}
+                                <span class="badge bg-secondary">{{ appointment.status }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if appointment.status == 'pending' or appointment.status == 'approved' %}
+                                <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-danger btn-sm">Cancel</a>
+                            {% else %}
+                                <span class="text-muted">No actions</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                You have no appointments yet. <a href="{% url 'book_appointment' %}" class="alert-link">Book your first appointment!</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

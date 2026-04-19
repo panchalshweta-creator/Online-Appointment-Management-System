@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Availability for {{ service.name }} - Business Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom fade-in">
+    <h1 class="h2">Manage Availability for "{{ service.name }}"</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <a href="{% url 'manage_services' %}" class="btn btn-sm btn-outline-secondary">Back to Services</a>
+    </div>
+</div>
+
+<div class="row slide-up">
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Add New Availability Slot
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="id_date" class="form-label">Date</label>
+                        <input type="date" class="form-control" id="id_date" name="date" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_start_time" class="form-label">Start Time</label>
+                        <input type="time" class="form-control" id="id_start_time" name="start_time" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="id_end_time" class="form-label">End Time</label>
+                        <input type="time" class="form-control" id="id_end_time" name="end_time" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Add Slot</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-6 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header">
+                Existing Availability Slots
+            </div>
+            <div class="card-body">
+                {% if availability_slots %}
+                <ul class="list-group">
+                    {% for slot in availability_slots %}
+                    <li class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>{{ slot.date|date:"M d, Y" }} {{ slot.start_time|time:"h:i A" }} - {{ slot.end_time|time:"h:i A" }}</span>
+                        {% if not slot.is_booked %}
+                            <form action="{% url 'delete_availability_slot' service.id slot.id %}" method="post" class="d-inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn btn-danger btn-sm">Delete</button>
+                            </form>
+                        {% else %}
+                            <span class="badge bg-warning text-dark">Booked</span>
+                        {% endif %}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% else %}
+                <div class="alert alert-info" role="alert">
+                    No availability slots added for this service yet.
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

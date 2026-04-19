@@ -1,0 +1,96 @@
+{% extends 'base.html' %}
+
+{% block title %}Client Dashboard - OAMS{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+    <div class="d-flex justify-content-between align-items-center mb-5 fade-in">
+        <h1 class="fw-bold">My Appointments</h1>
+        <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-4">Browse Services</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+            <div class="alert alert-{{ message.tags }} alert-dismissible fade show rounded-4 shadow-sm" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        {% endfor %}
+    {% endif %}
+
+    {% if appointments %}
+    <div class="row g-4">
+        {% for appointment in appointments %}
+        <div class="col-12 fade-in">
+            <div class="card shadow-sm border-0 rounded-4 overflow-hidden">
+                <div class="card-body p-4">
+                    <div class="row align-items-center">
+                        <div class="col-md-4">
+                            <h5 class="fw-bold mb-1">{{ appointment.service.name }}</h5>
+                            <p class="text-muted small mb-0">Professional: <strong>{{ appointment.service.service_provider.business_name|default:appointment.service.service_provider.user.username }}</strong></p>
+                            <span class="badge bg-soft-primary text-primary mt-2">{{ appointment.service.service_provider.category.name }}</span>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="d-flex align-items-center mb-1">
+                                <i class="bi bi-calendar-event me-2 text-primary"></i>
+                                <span class="fw-semibold">{{ appointment.availability_slot.date|date:"M d, Y" }}</span>
+                            </div>
+                            <div class="d-flex align-items-center">
+                                <i class="bi bi-clock me-2 text-primary"></i>
+                                <span class="text-muted small">{{ appointment.availability_slot.start_time|time:"h:i A" }} - {{ appointment.availability_slot.end_time|time:"h:i A" }}</span>
+                            </div>
+                        </div>
+                        <div class="col-md-2 text-center">
+                            {% if appointment.status == 'Pending' %}
+                                <span class="badge bg-warning text-dark px-3 py-2 rounded-pill">Pending</span>
+                            {% elif appointment.status == 'Accepted' or appointment.status == 'Rescheduled' %}
+                                <span class="badge bg-success px-3 py-2 rounded-pill">Accepted</span>
+                            {% elif appointment.status == 'Rejected' %}
+                                <span class="badge bg-danger px-3 py-2 rounded-pill">Rejected</span>
+                            {% elif appointment.status == 'Reschedule Requested' %}
+                                <span class="badge bg-info text-dark px-3 py-2 rounded-pill">Reschedule Requested</span>
+                            {% else %}
+                                <span class="badge bg-secondary px-3 py-2 rounded-pill">{{ appointment.status }}</span>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-3 text-end">
+                            {% if appointment.status == 'Reschedule Requested' %}
+                                <div class="p-3 bg-light rounded-3 mb-3 text-start small">
+                                    <div class="fw-bold mb-1 text-info">Proposed Reschedule:</div>
+                                    <div>Date: {{ appointment.reschedule_date|date:"M d, Y" }}</div>
+                                    <div>Time: {{ appointment.reschedule_time|time:"h:i A" }}</div>
+                                    <div class="mt-2 d-flex gap-2">
+                                        <form method="POST" action="{% url 'respond_to_reschedule' appointment.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="accept">
+                                            <button type="submit" class="btn btn-success btn-sm rounded-pill px-3">Accept</button>
+                                        </form>
+                                        <form method="POST" action="{% url 'respond_to_reschedule' appointment.id %}">
+                                            {% csrf_token %}
+                                            <input type="hidden" name="action" value="reject">
+                                            <button type="submit" class="btn btn-outline-danger btn-sm rounded-pill px-3">Reject</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            {% endif %}
+                            
+                            {% if appointment.status == 'Pending' or appointment.status == 'Accepted' %}
+                                <a href="{% url 'cancel_appointment' appointment.id %}" class="btn btn-outline-danger btn-sm rounded-pill px-4">Cancel</a>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5 bg-light rounded-4 fade-in">
+        <i class="bi bi-calendar-x fs-1 text-muted mb-3 d-block"></i>
+        <h3 class="fw-bold">No appointments yet</h3>
+        <p class="text-muted mb-4">You haven't booked any appointments yet. Start exploring now!</p>
+        <a href="{% url 'home' %}" class="btn btn-primary rounded-pill px-5 py-2">Find a Professional</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

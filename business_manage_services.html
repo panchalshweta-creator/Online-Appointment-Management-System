@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+
+{% block title %}Manage Services - Business Dashboard{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom fade-in">
+    <h1 class="h2">Manage Your Services</h1>
+    <div class="btn-toolbar mb-2 mb-md-0">
+        <div class="btn-group me-2">
+            <a href="{% url 'add_service' %}" class="btn btn-sm btn-outline-primary">Add New Service</a>
+        </div>
+    </div>
+</div>
+
+<div class="row slide-up">
+    {% if services %}
+        <div class="table-responsive">
+            <table class="table table-striped table-sm">
+                <thead>
+                    <tr>
+                        <th>Service Name</th>
+                        <th>Description</th>
+                        <th>Price (₹)</th>
+                        <th>Duration (minutes)</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for service in services %}
+                    <tr>
+                        <td>{{ service.name }}</td>
+                        <td>{{ service.description|truncatechars:50 }}</td>
+                        <td>₹{{ service.price }}</td>
+                        <td>{{ service.duration }}</td>
+                        <td>
+                            <a href="{% url 'edit_service' service.id %}" class="btn btn-info btn-sm me-1">Edit</a>
+                            <a href="{% url 'delete_service' service.id %}" class="btn btn-danger btn-sm me-1">Delete</a>
+                            <a href="{% url 'manage_availability' service.id %}" class="btn btn-secondary btn-sm">Manage Availability</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info" role="alert">
+                You have not added any services yet. <a href="{% url 'add_service' %}" class="alert-link">Add your first service!</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

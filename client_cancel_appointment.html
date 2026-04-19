@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Cancel Appointment - OAMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom fade-in">
+    <h1 class="h2">Cancel Appointment</h1>
+</div>
+
+<div class="row slide-up">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <p>Are you sure you want to cancel your appointment for "<strong>{{ appointment.service.name }}</strong>" with <strong>{{ appointment.service.service_provider.user.username }}</strong> on {{ appointment.availability_slot.date|date:"M d, Y" }} at {{ appointment.availability_slot.start_time|time:"h:i A" }}?</p>
+                <form method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger me-2">Yes, Cancel</button>
+                    <a href="{% url 'client_appointments' %}" class="btn btn-outline-secondary">No, Go Back</a>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

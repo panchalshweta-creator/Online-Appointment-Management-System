@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Client Profile - OAMS{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between flex-wrap flex-md-nowrap align-items-center pt-3 pb-2 mb-3 border-bottom fade-in">
+    <h1 class="h2">Your Profile</h1>
+</div>
+
+<div class="row slide-up">
+    <div class="col-lg-8">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>Email:</strong> {{ user.email }}</p>
+                <p><strong>Role:</strong> {{ user.role|capfirst }}</p>
+                <!-- Add more client-specific profile details here if needed -->
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
